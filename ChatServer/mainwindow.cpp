@@ -25,7 +25,7 @@ void MainWindow::on_startStopButton_clicked()//服务器启动关闭
         ui->startStopButton->setText("启动服务器");
         logMessage("服务器已经停止");
     }else{
-        if(!m_chatServer->listen(QHostAddress::Any,1967)){
+        if(!m_chatServer->listen(QHostAddress::Any,8080)){
             QMessageBox::critical(this,"错误","无法启动服务器");
             return;
         }

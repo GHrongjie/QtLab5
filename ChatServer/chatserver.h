@@ -13,7 +13,7 @@ public:
 
 protected:
     void incomingConnection(qintptr socketDescriptor)override;
-    QVector<ServerWorker*> m_clients;//链接池，保存用户链接
+    QVector<ServerWorker *> m_clients;//链接池，保存用户链接
 
 signals:
     void logMessage(const QString &msg);

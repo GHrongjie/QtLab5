@@ -2,6 +2,7 @@
 #include <QDataStream>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include <QHostAddress>
 
 ServerWorker::ServerWorker(QObject *parent)
     : QObject{parent}
@@ -15,13 +16,13 @@ bool ServerWorker::setSocketDescriptor(qintptr socketDescriptor)//返回链接�
     return m_serverSocket->setSocketDescriptor(socketDescriptor);
 }
 
-void ServerWorker::onReadyRead()
+void ServerWorker::onReadyRead()//服务器启动
 {
     QByteArray jsonData;
     QDataStream socketStream(m_serverSocket);
     socketStream.setVersion(QDataStream::Qt_6_7);
 
-    for(;;){//循环接受信息
+    for(;;){//循环从客户端接受信息
         socketStream.startTransaction();
         socketStream >> jsonData;
         if(socketStream.commitTransaction()){
@@ -33,7 +34,7 @@ void ServerWorker::onReadyRead()
     }
 }
 
-void ServerWorker::sendMessage(const QString &text, const QString &type)
+void ServerWorker::sendMessage(const QString &text, const QString &type)//发送信息给客户端
 {
     if(m_serverSocket->state() != QAbstractSocket::ConnectedState)
         return;

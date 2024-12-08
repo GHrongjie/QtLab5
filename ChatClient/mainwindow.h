@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "chatclient.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class MainWindow;
@@ -24,7 +26,11 @@ private slots:
 
     void on_sayButton_clicked();
 
+    void connectedToServer();
+    void messageReceived(const QString &text);
+
 private:
     Ui::MainWindow *ui;
+    ChatClient *m_chatClient;//对话用户
 };
 #endif // MAINWINDOW_H
