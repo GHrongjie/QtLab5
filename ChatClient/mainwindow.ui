@@ -58,7 +58,7 @@ border-radius:25px
            <widget class="QTextEdit" name="roomTextEdit"/>
           </item>
           <item>
-           <widget class="QListView" name="userListWidget">
+           <widget class="QListWidget" name="userListWidget">
             <property name="maximumSize">
              <size>
               <width>120</width>

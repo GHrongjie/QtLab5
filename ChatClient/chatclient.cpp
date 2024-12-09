@@ -25,7 +25,14 @@ void ChatClient::onReadyRead()//确认收到TCP的readyRead信号，客户端启
         socketStream >> jsonData;
         if(socketStream.commitTransaction()){
             //收到信息，信息作为信号发送给ChatClient的messageReceived
-            emit messageReceived(QString::fromUtf8(jsonData));
+            // emit messageReceived(QString::fromUtf8(jsonData));
+
+            //json解析
+            QJsonParseError parserError;
+            const QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData,&parserError);
+            if(parserError.error == QJsonParseError::NoError){
+                emit jsonReceived(jsonDoc.object());
+            }
         }else{
             break;
         }
@@ -55,4 +62,9 @@ void ChatClient::sendMessage(const QString &text, const QString &type)//发送�
 void ChatClient::connectToServer(const QHostAddress &address, quint16 port)//链接地址端口
 {
     m_clientSocket->connectToHost(address,port);
+}
+
+void ChatClient::disconnectFromHost()//断开链接
+{
+    m_clientSocket->disconnectFromHost();
 }
