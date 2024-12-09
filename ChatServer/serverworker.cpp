@@ -16,6 +16,16 @@ bool ServerWorker::setSocketDescriptor(qintptr socketDescriptor)//返回链接�
     return m_serverSocket->setSocketDescriptor(socketDescriptor);
 }
 
+QString ServerWorker::userName()
+{
+    return m_userName;
+}
+
+void ServerWorker::setUserName(QString user)
+{
+    m_userName=user;
+}
+
 void ServerWorker::onReadyRead()//服务器启动
 {
     QByteArray jsonData;
@@ -26,8 +36,16 @@ void ServerWorker::onReadyRead()//服务器启动
         socketStream.startTransaction();
         socketStream >> jsonData;
         if(socketStream.commitTransaction()){
-            emit logMessage(QString::fromUtf8(jsonData));
-            sendMessage("I recieved message");
+            // emit logMessage(QString::fromUtf8(jsonData));
+            // sendMessage("I recieved message");
+
+            //json解析
+            QJsonParseError parserError;
+            const QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData,&parserError);
+            if(parserError.error == QJsonParseError::NoError){
+                emit logMessage(QJsonDocument(jsonDoc).toJson(QJsonDocument::Compact));
+                emit jsonReceived(this,jsonDoc.object());
+            }
         }else{
             break;
         }
@@ -52,4 +70,14 @@ void ServerWorker::sendMessage(const QString &text, const QString &type)//发送
         //用QDataStream发送json数据
         serverStream << QJsonDocument(message).toJson();
     }
+}
+
+void ServerWorker::sendJson(const QJsonObject &json)//发送Json信息，在广播时调用
+{
+    const QByteArray jsonData = QJsonDocument(json).toJson(QJsonDocument::Compact);
+    emit logMessage(QLatin1String("Sending to ") + userName() + QLatin1String(" - ")+
+                    QString::fromUtf8(jsonData));
+    QDataStream socketStream(m_serverSocket);
+    socketStream.setVersion(QDataStream::Qt_6_7);
+    socketStream << jsonData;
 }
