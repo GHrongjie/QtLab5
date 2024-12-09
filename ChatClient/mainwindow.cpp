@@ -33,7 +33,14 @@ void MainWindow::on_loginButton_clicked()//尝试链接服务器
 
 void MainWindow::on_logoutButton_clicked()//退出并断开链接
 {
+    m_chatClient->disconnectFromHost();
     ui->stackedWidget->setCurrentWidget(ui->LoginPage);
+
+    for( auto aItem : ui->userListWidget->findItems(ui->userNameEdit->text(),Qt::MatchExactly)){
+        qDebug("remove");
+        ui->userListWidget->removeItemWidget(aItem);
+        delete aItem;
+    }
 }
 
 
@@ -76,13 +83,40 @@ void MainWindow::jsonReceived(const QJsonObject &docObj)
         if(userNameVal.isNull() || !userNameVal.isString())
             return;
 
-
         userJoined(userNameVal.toString());
+    }else if(typeVal.toString().compare("userdisconnected",Qt::CaseInsensitive)==0){//如果是退出信息
+        const QJsonValue userNameVal = docObj.value("username");//用户名是否为空
+        if(userNameVal.isNull() || !userNameVal.isString())
+            return;
+
+        userLeft(userNameVal.toString());
+    }else if(typeVal.toString().compare("userlist",Qt::CaseInsensitive)==0){//如果是退出信息
+        const QJsonValue userlistVal = docObj.value("userlist");
+        if(userlistVal.isNull() || !userlistVal.isArray())
+            return;
+
+        qDebug() << userlistVal.toVariant().toStringList();
+        userListReceived(userlistVal.toVariant().toStringList());
     }
 }
 
 void MainWindow::userJoined(const QString &user)//将新用户添加到聊天室列表
 {
     ui->userListWidget->addItem(user);
+}
+
+void MainWindow::userLeft(const QString &user)//将新用户从聊天室列表移除
+{
+    for( auto aItem : ui->userListWidget->findItems(user,Qt::MatchExactly)){
+        qDebug("remove");
+        ui->userListWidget->removeItemWidget(aItem);
+        delete aItem;
+    }
+}
+
+void MainWindow::userListReceived(const QStringList &list)
+{
+    ui->userListWidget->clear();
+    ui->userListWidget->addItems(list);
 }
 

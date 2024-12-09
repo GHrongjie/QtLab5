@@ -2,6 +2,7 @@
 #include "serverworker.h"
 #include <QJsonValue>
 #include <QJsonObject>
+#include <QJsonArray>
 
 ChatServer::ChatServer(QObject *parent):
     QTcpServer(parent) {
@@ -17,6 +18,7 @@ void ChatServer::incomingConnection(qintptr socketDescriptor)//监听新用户�
     }
     connect(worker, &ServerWorker::logMessage,this,&ChatServer::logMessage);
     connect(worker, &ServerWorker::jsonReceived,this,&ChatServer::jsonReceived);
+    connect(worker, &ServerWorker::disconnectedFromClient,this,std::bind(&ChatServer::userDisconnected,this,worker));
     m_clients.append(worker);//将新用户加入链接池
     emit logMessage("new user has connected");
 }
@@ -62,5 +64,32 @@ void ChatServer::jsonReceived(ServerWorker *sender, const QJsonObject &docObj)//
         connectedMessage["type"] = "newUser";//信息类型
         connectedMessage["username"] = userNameVal.toString();//加入的用户名
         broadcast(connectedMessage,sender);//向所有用户广播
+
+        //给新登录用户发送聊天室用户表
+        QJsonObject userListMessage;
+        userListMessage["type"] = "userlist";//信息类型
+        QJsonArray userList;
+        for(ServerWorker *worker : m_clients){
+            if(worker == sender)
+                userList.append(worker->userName()+ "+");
+            else
+                userList.append(worker->userName());
+        }
+        userListMessage["userlist"] = userList;
+        sender->sendJson(userListMessage);
     }
+}
+
+void ChatServer::userDisconnected(ServerWorker *sender)//处理用户断开链接
+{
+    m_clients.removeAll(sender);
+    const QString userName = sender->userName();
+    if(!userName.isEmpty()){//移除的用户名广播出去，让其余用户的用户列表删除该用户
+        QJsonObject disconnectedMessage;
+        disconnectedMessage["type"] = "userdisconnected";
+        disconnectedMessage["username"] = userName;
+        broadcast(disconnectedMessage,nullptr);
+        emit logMessage(userName + " disconnected");
+    }
+    sender->deleteLater();
 }

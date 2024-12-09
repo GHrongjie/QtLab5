@@ -33,6 +33,8 @@ private slots:
     void jsonReceived(const QJsonObject &docObj);
 
     void userJoined(const QString &user);
+    void userLeft(const QString &user);
+    void userListReceived(const QStringList &list);
 
 private:
     Ui::MainWindow *ui;

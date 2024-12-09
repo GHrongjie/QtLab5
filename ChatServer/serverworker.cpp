@@ -8,7 +8,10 @@ ServerWorker::ServerWorker(QObject *parent)
     : QObject{parent}
 {
     m_serverSocket = new QTcpSocket(this);//新建链接
+    //链接完毕，传信号给onReadyRead()来开始监听用户信息
     connect(m_serverSocket,&QTcpSocket::readyRead,this,&ServerWorker::onReadyRead);
+    //链接断开，传信号给disconnectedFromClient()来开始处理用户断连
+    connect(m_serverSocket,&QTcpSocket::disconnected,this,&ServerWorker::disconnectedFromClient);
 }
 
 bool ServerWorker::setSocketDescriptor(qintptr socketDescriptor)//返回链接描述符
@@ -72,7 +75,7 @@ void ServerWorker::sendMessage(const QString &text, const QString &type)//发送
     }
 }
 
-void ServerWorker::sendJson(const QJsonObject &json)//发送Json信息，在广播时调用
+void ServerWorker::sendJson(const QJsonObject &json)//发送Json信息
 {
     const QByteArray jsonData = QJsonDocument(json).toJson(QJsonDocument::Compact);
     emit logMessage(QLatin1String("Sending to ") + userName() + QLatin1String(" - ")+
