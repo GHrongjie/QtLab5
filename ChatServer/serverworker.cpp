@@ -24,9 +24,29 @@ QString ServerWorker::userName()
     return m_userName;
 }
 
-void ServerWorker::setUserName(QString user)
+void ServerWorker::setUserName(const QString& user)
 {
     m_userName=user;
+}
+
+QString ServerWorker::userIdentity()
+{
+    return m_identity;
+}
+
+void ServerWorker::setUserIdentity(const QString &identity)
+{
+    m_identity=identity;
+}
+
+bool ServerWorker::userStatus()
+{
+    return m_status;
+}
+
+void ServerWorker::setUserStatus(const bool& status)
+{
+    m_status=status;
 }
 
 void ServerWorker::onReadyRead()//服务器启动

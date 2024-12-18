@@ -17,12 +17,16 @@ signals:
 
 private:
     QTcpSocket *m_clientSocket;
+    QString m_identity;
 
 public slots:
     void onReadyRead();
-    void sendMessage(const QString &text,const QString &type = "message");
+    void sendMessage(const QString &text,const QString &type = "message",const QString &identity=nullptr);
     void connectToServer(const QHostAddress &address, quint16 port);
     void disconnectFromHost();
+
+    QString userIdentity();
+    void setUserIdentity(const QString& identity);
 };
 
 #endif // CHATCLIENT_H

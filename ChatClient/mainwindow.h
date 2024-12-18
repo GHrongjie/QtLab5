@@ -4,6 +4,8 @@
 #include <QMainWindow>
 
 #include "chatclient.h"
+#include "chathistorydialog.h"
+#include "manageusersdialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,6 +21,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+
+
 private slots:
     void on_loginButton_clicked();
 
@@ -26,18 +31,25 @@ private slots:
 
     void on_sayButton_clicked();
 
+    void on_chatHistoryButton_clicked();
+
     void connectedToServer();
 
     void messageReceived(const QString &sender,const QString &text);
 
-    void jsonReceived(const QJsonObject &docObj);
-
     void userJoined(const QString &user);
     void userLeft(const QString &user);
+    void jsonReceived(const QJsonObject &docObj);
     void userListReceived(const QStringList &list);
+
+    void on_manageUserButton_clicked();
 
 private:
     Ui::MainWindow *ui;
+
+    ChatHistoryDialog *m_chatHistoryDialog;
+    ManageUsersDialog *m_manageUsersDialog;
     ChatClient *m_chatClient;//对话用户
+
 };
 #endif // MAINWINDOW_H

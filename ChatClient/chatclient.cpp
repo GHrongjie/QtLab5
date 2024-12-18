@@ -39,7 +39,7 @@ void ChatClient::onReadyRead()//确认收到TCP的readyRead信号，客户端启
     }
 }
 
-void ChatClient::sendMessage(const QString &text, const QString &type)//发送信息给服务器端
+void ChatClient::sendMessage(const QString &text, const QString &type,const QString &identity)//发送信息给服务器端
 {
     if(m_clientSocket->state() != QAbstractSocket::ConnectedState)
         return;
@@ -53,6 +53,7 @@ void ChatClient::sendMessage(const QString &text, const QString &type)//发送�
         QJsonObject message;
         message["type"] = type;
         message["text"] = text;
+        message["userIdentity"] = identity;
 
         //用QDataStream发送json数据
         serverStream << QJsonDocument(message).toJson();
@@ -67,4 +68,14 @@ void ChatClient::connectToServer(const QHostAddress &address, quint16 port)//链
 void ChatClient::disconnectFromHost()//断开链接
 {
     m_clientSocket->disconnectFromHost();
+}
+
+QString ChatClient::userIdentity()
+{
+    return m_identity;
+}
+
+void ChatClient::setUserIdentity(const QString &identity)
+{
+    m_identity=identity;
 }

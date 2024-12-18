@@ -12,7 +12,11 @@ public:
     virtual bool setSocketDescriptor(qintptr socketDescriptor);
 
     QString userName();
-    void setUserName(QString user);
+    void setUserName(const QString& user);
+    QString userIdentity();
+    void setUserIdentity(const QString& identity);
+    bool userStatus();
+    void setUserStatus(const bool& status);
 
 signals:
     void logMessage(const QString &msg);
@@ -22,6 +26,8 @@ signals:
 private:
     QTcpSocket *m_serverSocket;
     QString m_userName;
+    QString m_identity;
+    bool m_status;
 
 public slots:
     void onReadyRead();

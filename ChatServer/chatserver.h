@@ -14,6 +14,7 @@ public:
 protected:
     void incomingConnection(qintptr socketDescriptor)override;
     QVector<ServerWorker *> m_clients;//链接池，保存用户链接
+    QMap<QString, ServerWorker*> m_userMap;
 
     void broadcast(const QJsonObject &message,ServerWorker *exclude);
 
