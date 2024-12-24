@@ -37,15 +37,18 @@ border-radius:25px
 }</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QVBoxLayout" name="verticalLayout">
-    <item>
+   <layout class="QGridLayout" name="gridLayout_5">
+    <item row="0" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout"/>
+    </item>
+    <item row="1" column="1">
      <widget class="QLabel" name="titleLabel">
       <property name="text">
        <string>沈荣杰的聊天室</string>
       </property>
      </widget>
     </item>
-    <item>
+    <item row="2" column="1">
      <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QPushButton" name="chatHistoryButton">
@@ -76,52 +79,71 @@ border-radius:25px
       </item>
      </layout>
     </item>
-    <item>
+    <item row="3" column="1">
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="ChatPage">
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout">
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QTextEdit" name="roomTextEdit"/>
+           <layout class="QHBoxLayout" name="horizontalLayout_4">
+            <item>
+             <widget class="QStackedWidget" name="chatStackedWidget">
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="QWidget" name="mainChatPage">
+               <layout class="QGridLayout" name="gridLayout_3">
+                <item row="0" column="0">
+                 <widget class="QTextEdit" name="roomTextEdit">
+                  <property name="readOnly">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </widget>
+            </item>
+            <item>
+             <widget class="QListWidget" name="userListWidget">
+              <property name="maximumSize">
+               <size>
+                <width>120</width>
+                <height>16777215</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
-           <widget class="QListWidget" name="userListWidget">
-            <property name="maximumSize">
-             <size>
-              <width>120</width>
-              <height>16777215</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <item>
-           <widget class="QLineEdit" name="sayLineEdit">
-            <property name="frame">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="sayButton">
-            <property name="text">
-             <string>发送</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="logoutButton">
-            <property name="text">
-             <string>退出</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QLineEdit" name="sayLineEdit">
+              <property name="frame">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="sayButton">
+              <property name="text">
+               <string>发送</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="logoutButton">
+              <property name="text">
+               <string>退出</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>

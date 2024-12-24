@@ -39,7 +39,7 @@ void ChatClient::onReadyRead()//确认收到TCP的readyRead信号，客户端启
     }
 }
 
-void ChatClient::sendMessage(const QString &text, const QString &type,const QString &identity)//发送信息给服务器端
+void ChatClient::sendMessage(const QString &text, const QString &type,const QString &autoV)//发送信息给服务器端
 {
     if(m_clientSocket->state() != QAbstractSocket::ConnectedState)
         return;
@@ -53,7 +53,7 @@ void ChatClient::sendMessage(const QString &text, const QString &type,const QStr
         QJsonObject message;
         message["type"] = type;
         message["text"] = text;
-        message["userIdentity"] = identity;
+        message["autoV"] = autoV;
 
         //用QDataStream发送json数据
         serverStream << QJsonDocument(message).toJson();

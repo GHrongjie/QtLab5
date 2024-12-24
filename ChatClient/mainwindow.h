@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QTextEdit>
+#include <QMap>
 
 #include "chatclient.h"
 #include "chathistorydialog.h"
@@ -35,12 +37,13 @@ private slots:
 
     void connectedToServer();
 
-    void messageReceived(const QString &sender,const QString &text);
+    void messageReceived(const QString &sender,const QString &text,const QString &reciver);
 
     void userJoined(const QString &user);
     void userLeft(const QString &user);
     void jsonReceived(const QJsonObject &docObj);
     void userListReceived(const QStringList &list);
+    void goToOtherChatPage(const QString& username);
 
     void on_manageUserButton_clicked();
 
@@ -50,6 +53,10 @@ private:
     ChatHistoryDialog *m_chatHistoryDialog;
     ManageUsersDialog *m_manageUsersDialog;
     ChatClient *m_chatClient;//对话用户
+
+    QString m_targetPage;//当前的对话目标
+    QMap<QString,int> m_chatPageIndex;//用户对应的页面索引，用来切换页面
+    QMap<QString,QTextEdit*> m_chatPages;//记录用户聊天界面
 
 };
 #endif // MAINWINDOW_H

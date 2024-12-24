@@ -1,5 +1,7 @@
 #include "chatserver.h"
 #include "serverworker.h"
+#include "idatabase.h"
+
 #include <QJsonValue>
 #include <QJsonObject>
 #include <QJsonArray>
@@ -60,10 +62,39 @@ void ChatServer::jsonReceived(ServerWorker *sender, const QJsonObject &docObj)//
         message[QStringLiteral("text")]=text;//信息内容
         message[QStringLiteral("sender")]=sender->userName();//谁发送的
 
-        broadcast(message,sender);//向所有用户广播
+        Idatabase::getInstance().saveRoomChatData(sender->userName(),text);//保存记录
+
+        broadcast(message,nullptr);//向所有用户广播
+    }else if(typeVal.toString().compare("selfMessage",Qt::CaseInsensitive)==0){//如果是私聊信息
+        const QJsonValue textVal = docObj.value("text");//信息内容是否为空
+        const QJsonValue reciverVal = docObj.value("autoV");//私聊目标是否为空
+        if(textVal.isNull() || !textVal.isString())
+            return;
+        if(reciverVal.isNull() || !reciverVal.isString())
+            return;
+        const QString text = textVal.toString().trimmed();
+        const QString reciver = reciverVal.toString().trimmed();
+        if(text.isEmpty())
+            return;
+        if(reciver.isEmpty())
+            return;
+        QJsonObject message;
+        message[QStringLiteral("type")]="selfMessage";//信息类型
+        message[QStringLiteral("text")]=text;//信息内容
+        message[QStringLiteral("sender")]=sender->userName();//谁发送的
+        message[QStringLiteral("reciver")]=reciver;//发送给谁
+
+        if(m_userMap.contains(reciver)){//如果接受方在线
+
+            Idatabase::getInstance().saveSelfChatData(sender->userName(),reciver,text);//保存记录
+
+            m_userMap[reciver]->sendJson(message);
+            sender->sendJson(message);
+        }
+
     }else if(typeVal.toString().compare("login",Qt::CaseInsensitive)==0){//如果是登录信息
         const QJsonValue userNameVal = docObj.value("text");//用户名是否为空
-        const QJsonValue userIdentity = docObj.value("userIdentity");//用户身份是否为空
+        const QJsonValue userIdentity = docObj.value("autoV");//用户身份是否为空
         if(userNameVal.isNull() || !userNameVal.isString())
             return;
         if(userIdentity.isNull() || !userIdentity.isString())
@@ -87,7 +118,7 @@ void ChatServer::jsonReceived(ServerWorker *sender, const QJsonObject &docObj)//
         QJsonObject connectedMessage;
         connectedMessage["type"] = "newUser";//信息类型
         connectedMessage["username"] = userNameVal.toString();//加入的用户名
-        broadcast(connectedMessage,sender);//向所有用户广播
+        broadcast(connectedMessage,nullptr);//向所有用户广播
 
         //给新登录用户发送聊天室用户表
         QJsonObject userListMessage;
@@ -117,6 +148,11 @@ void ChatServer::jsonReceived(ServerWorker *sender, const QJsonObject &docObj)//
         const QJsonValue userNameVal = docObj.value("text");//用户名是否为空
         if(userNameVal.isNull() || !userNameVal.isString())
             return;
+        // 检查用户名是否已经在线
+        if (!m_userMap.contains(userNameVal.toString())) {
+            // 如果用户不在线
+            return;
+        }
         QJsonObject message;
         message[QStringLiteral("type")]="kickout";//信息类型
         message[QStringLiteral("text")]=userNameVal.toString();//目标用户
@@ -124,7 +160,12 @@ void ChatServer::jsonReceived(ServerWorker *sender, const QJsonObject &docObj)//
         m_userMap[userNameVal.toString()]->sendJson(message);
     }else if(typeVal.toString().compare("banUser",Qt::CaseInsensitive)==0){//禁言或解除禁言
         const QJsonValue userNameVal = docObj.value("text");//用户名是否为空
-        const QJsonValue status = docObj.value("userIdentity");//禁言状态是否为空
+        const QJsonValue status = docObj.value("autoV");//禁言状态是否为空
+        // 检查用户名是否已经在线
+        if (!m_userMap.contains(userNameVal.toString())) {
+            // 如果用户不在线
+            return;
+        }
         if(userNameVal.isNull() || !userNameVal.isString())
             return;
         if(status.isNull() || !status.isString())

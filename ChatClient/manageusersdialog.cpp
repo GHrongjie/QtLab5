@@ -9,6 +9,12 @@ ManageUsersDialog::ManageUsersDialog(QWidget *parent)
     , ui(new Ui::ManageUsersDialog)
 {
     ui->setupUi(this);
+    connect(ui->userListWidget,&QListWidget::itemClicked,this,[this](QListWidgetItem *item){
+        // 获取点击项的文本
+        QString userName = item->text();
+        // 调用槽函数，将用户的名字传递过去
+        showUserNameInEdit(userName);
+    });
 }
 
 ManageUsersDialog::~ManageUsersDialog()
@@ -48,6 +54,11 @@ void ManageUsersDialog::userListReceived(const QStringList &list)
 {
     ui->userListWidget->clear();
     ui->userListWidget->addItems(list);
+}
+
+void ManageUsersDialog::showUserNameInEdit(const QString& username)
+{
+     ui->targetLineEdit->setText(username);
 }
 
 void ManageUsersDialog::on_kickoutUserButton_clicked()
